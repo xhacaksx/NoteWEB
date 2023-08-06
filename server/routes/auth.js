@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-
+const User=require('../models/User');
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 passport.use(
@@ -11,12 +11,36 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_CALLBACK_URL
     },
-    async function (accessToken, refreshToken, profile, cb) {
+    async function (accessToken, refreshToken, profile, done) {
       // User.findOrCreate({ googleId: profile.id }, function (err, user) {
       //   return cb(err, user);
       // });
 
-      console.log(profile);
+      //console.log(profile);
+      const newUser = {
+        googleId: profile.id,
+        displayName: profile.displayName,
+        firstName: profile.name.givenName,
+        // lastName: profile.name.familyName,
+        profileImage: profile.photos[0].value,
+
+      };
+      try {
+        let user = await User.findOne({googleId: profile.id});
+        if(user) {
+          done(null,user);
+        }
+        else {
+          user =await User.create(newUser);
+          done(null,user);
+        }
+
+      }
+      
+      catch(error){
+        console.log(error);
+      }
+
     }
   )
 );
@@ -41,4 +65,36 @@ router.get(
     res.send('Something went wrong...');
   });
 
+  //destroy user session
+
+  router.get('/logout',(req,res)=>{
+    req.session.destroy(error=>{
+      if(error){
+        console.log(error);
+        res.send('Error loggin in');
+      } else {
+        res.redirect('/');
+      }
+      
+    })
+  })
+
+
+  //persist
+
+  passport.serializeUser(function(user,done){
+    done(null,user.id);
+  })
+
+
+  //retrive user data
+
+  passport.deserializeUser(async(id,done)=>{
+    try {
+      const user = await User.findById(id);
+      done(null,user);
+    }catch(err){
+      done(err,null);
+    }
+  })
 module.exports = router;

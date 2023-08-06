@@ -19,9 +19,16 @@ const MongoStore = require('connect-mongo');
 const app=express();
 const port=5000 || process.env.PORT;
 
-
+app.use(session({
+    secret: 'mouse',
+    resave: false,
+    saveUninitialized:true,
+    store:MongoStore.create({
+        mongoUrl:process.env.MONGODB_URI
+    })
+}))
 app.use(passport.initialize());
-//app.use(passport.session);
+app.use(passport.session());
 
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
