@@ -1,0 +1,31 @@
+/* body {
+    background: aqua;
+} */
+
+:root {
+    --background-color: #FFC700;
+    --bs-primary-rgb: #12296c;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--bs-primary-rgb);
+    font-weight: 300;
+    font-size: 1.2rem;
+    
+}
+
+h1,h2,h3,h4,h5.h6 {
+    font-family: 'Unbounded',cursive;
+    font-weight: 800;
+}
+
+.container-fluid-custom {
+    max-width: 1600px;
+}
+
+.pagination {
+    --bs-pagination-color: var(--bs-primary-rgb);
+    --bs-pagination-active-bg: var(--bs-primary-rgb);
+    --bs-pagination-active-border-color:var(--bs-primary-rgb);
+}
